@@ -64,3 +64,45 @@ This is an unofficial SIYI A8 Mini gimbal camera control package, the software i
         To select Lock Mode then publish as 2, the pan and tilt are locked in place even the attached frame is moving.
 ```
 
+## Run
+
+```sh
+
+## Create a virtual V4L2 device with the name of Fake Device on /dev/video40
+sudo modprobe v4l2loopback video_nr=40 exclusive_caps=1 card_label="Fake Device"
+
+## Terminal 1
+## start a ROS node with camera IP of 192.168.10.59, and video_out to /dev/video40 device
+ros2 run siyi_cam camera_control --ros-args -p cam_ip:="192.168.10.59" -p video_out:="/dev/video40"
+
+## Terminal 2
+## If want to see camera from ROS image transport topic,
+ros2 run image_tools  showimage  --ros-args -r image:=/siyi/image -p reliability:=best_effort
+
+## OR play video as another webcam device
+ffplay /dev/video40
+
+## Terminal 3
+## Pan gimbal to left
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [1,0,0,0,0]"
+## Stop gimbal
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,0,0]"
+## Pan gimbal to right
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,0,1]"
+## Stop gimbal
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,0,0]"
+## Tilt gimbal up
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,1,0,0,0]"
+## Stop gimbal
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,0,0]"
+## Tilt gimbal down
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,1,0]"
+## Stop gimbal
+ros2 topic pub --once /siyi/gimbal std_msgs/msg/Int16MultiArray "data: [0,0,0,0,0]"
+
+## Zoom in
+ros2 topic pub --once /siyi/zoom std_msgs/msg/Int16MultiArray "data: [1,0]"
+## Zoom out
+ros2 topic pub --once /siyi/zoom std_msgs/msg/Int16MultiArray "data: [0,1]"
+
+```
