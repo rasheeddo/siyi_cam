@@ -1,0 +1,1 @@
+ros2 run siyi_cam  camera_control --ros-args -p cam_ip:="192.168.1.59" -p video_out:="/dev/video40"
